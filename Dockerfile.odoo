@@ -1,0 +1,26 @@
+FROM python:3.12
+
+# Install dependencies and Odoo
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    unzip \
+    wget \
+    libldap2-dev \
+    libsasl2-dev \
+    && rm -rf /var/lib/apt/lists/*
+
+WORKDIR /opt/odoo
+
+RUN wget https://github.com/odoo/odoo/archive/refs/heads/18.0.zip \
+    && unzip 18.0.zip \
+    && rm 18.0.zip \
+    && mv odoo-18.0 odoo
+
+COPY odoo.conf /opt/odoo/odoo/odoo.conf
+
+WORKDIR /opt/odoo/odoo
+
+RUN pip install -r requirements.txt
+
+EXPOSE 8069
+
+CMD ["python3", "odoo-bin", "-c", "/opt/odoo/odoo/odoo.conf"]
