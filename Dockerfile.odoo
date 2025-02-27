@@ -1,6 +1,6 @@
 FROM python:3.12
 
-# Install dependencies and Odoo
+# Install system dependencies
 RUN apt-get update && apt-get install -y --no-install-recommends \
     unzip \
     wget \
@@ -10,17 +10,32 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 
 WORKDIR /opt/odoo
 
-RUN wget https://github.com/odoo/odoo/archive/refs/heads/18.0.zip \
-    && unzip 18.0.zip \
-    && rm 18.0.zip \
-    && mv odoo-18.0 odoo
-
-COPY odoo.conf /opt/odoo/odoo/odoo.conf
+# Download and extract Odoo - mantiene ARG como lo pediste
+ARG ODOO_VERSION
+RUN wget https://github.com/odoo/odoo/archive/refs/heads/${ODOO_VERSION}.zip \
+    && unzip ${ODOO_VERSION}.zip \
+    && rm ${ODOO_VERSION}.zip \
+    && mv odoo-${ODOO_VERSION} odoo
 
 WORKDIR /opt/odoo/odoo
 
-RUN pip install -r requirements.txt
+# Install Python dependencies from Odoo's requirements.txt
+RUN pip install --no-cache-dir -r requirements.txt
+
+# Crear directorio para addons personalizados
+RUN mkdir -p /opt/odoo/custom-addons
+
+# Runtime configuration
+COPY entrypoint.sh /entrypoint.sh
+RUN chmod +x /entrypoint.sh
+
+# Crear usuario no-root para mayor seguridad
+RUN useradd -ms /bin/bash odoo
+RUN mkdir -p /var/lib/odoo && chown -R odoo:odoo /var/lib/odoo /opt/odoo
 
 EXPOSE 8069
 
-CMD ["python3", "odoo-bin", "-c", "/opt/odoo/odoo/odoo.conf"]
+USER odoo
+ENTRYPOINT ["/entrypoint.sh"]
+# El CMD simplificado, las variables se manejarán en el entrypoint
+CMD ["python3", "odoo-bin"]

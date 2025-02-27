@@ -3,9 +3,9 @@ services:
     image: postgres:15-alpine
     container_name: odoo-db
     environment:
-      - POSTGRES_DB=postgres
-      - POSTGRES_USER=odoo
-      - POSTGRES_PASSWORD=odoo
+      - POSTGRES_DB=${POSTGRES_DB}
+      - POSTGRES_USER=${POSTGRES_USER}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
     volumes:
       - postgres_data:/var/lib/postgresql/data
     networks:
@@ -15,17 +15,24 @@ services:
     build:
       context: .
       dockerfile: Dockerfile.odoo
+      args:
+        - ODOO_VERSION=${ODOO_VERSION}
     container_name: odoo-app
     depends_on:
       - db
     environment:
-      - HOST=db
-      - USER=odoo
-      - PASSWORD=odoo
+      - ODOO_VERSION=${ODOO_VERSION}
+      - DB_HOST=${POSTGRES_HOST}
+      - DB_PORT=${POSTGRES_PORT}
+      - DB_USER=${POSTGRES_USER}
+      - DB_PASSWORD=${POSTGRES_PASSWORD}
+      - ADDONS_PATH=${ODOO_ADDONS_PATH}
     ports:
-      - "8069:8069"
+      - "${ODOO_PORT}:8069"
     networks:
       - odoo-network
+    volumes:
+      - ./addons:/opt/odoo/custom-addons
 
 volumes:
   postgres_data:
