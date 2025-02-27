@@ -1,0 +1,2 @@
+# Additional Python packages, this is an example
+python-dotenv
