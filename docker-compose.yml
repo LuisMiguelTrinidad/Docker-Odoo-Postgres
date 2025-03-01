@@ -28,19 +28,23 @@ services:
       - DB_PASSWORD=${POSTGRES_PASSWORD}
       - ODOO_ADDONS_PATH=${ODOO_ADDONS_PATH}
       - POSTGRES_DB=${POSTGRES_DB}
+      - PYTHONPATH=/opt/odoo/odoo
+      - DEBUGPY_ENABLE=${DEBUGPY_ENABLE:-0}
     ports:
       - "${ODOO_PORT}:8069"
+      - "5678:5678"  # Puerto para debugger
     networks:
       - odoo-network
     volumes:
       - ./addons:/opt/odoo/custom-addons
       - odoo-data:/var/lib/odoo
-      - odoo-config:/etc/odoo
+      - ./:/workspace:cached  # Para VS Code Remote Development
+      - ./.vscode:/opt/odoo/.vscode
+      - ./scripts:/opt/odoo/scripts
 
 volumes:
   postgres_data:
   odoo-data:
-  odoo-config:
 
 networks:
   odoo-network:

@@ -42,6 +42,9 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 # Pre-install Cython con una versión específica
 RUN pip install --no-cache-dir Cython==3.0.0
 
+# Instalar herramientas de desarrollo
+RUN pip install --no-cache-dir debugpy
+
 # Install wkhtmltopdf
 RUN curl -o wkhtmltox.deb -sSL https://github.com/wkhtmltopdf/packaging/releases/download/0.12.6.1-2/wkhtmltox_0.12.6.1-2.bullseye_amd64.deb \
     && apt-get update && apt-get install -y --no-install-recommends ./wkhtmltox.deb \
@@ -79,6 +82,10 @@ RUN pip install --upgrade pip && \
 RUN mkdir -p /var/lib/odoo /opt/odoo/custom-addons \
     && chown -R odoo:odoo /var/lib/odoo /opt/odoo \
     && chmod -R 775 /var/lib/odoo /opt/odoo/custom-addons
+
+# Crear directorio para scripts personalizados
+RUN mkdir -p /opt/odoo/scripts
+COPY scripts/ /opt/odoo/scripts/
 
 # Add permission fix script
 COPY fix-permissions.sh /usr/local/bin/fix-permissions.sh
