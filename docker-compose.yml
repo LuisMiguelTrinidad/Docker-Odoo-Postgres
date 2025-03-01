@@ -14,7 +14,7 @@ services:
   odoo:
     build:
       context: .
-      dockerfile: Dockerfile.odoo
+      dockerfile: Dockerfile
       args:
         - ODOO_VERSION=${ODOO_VERSION}
     container_name: odoo-app
@@ -26,16 +26,21 @@ services:
       - DB_PORT=${POSTGRES_PORT}
       - DB_USER=${POSTGRES_USER}
       - DB_PASSWORD=${POSTGRES_PASSWORD}
-      - ADDONS_PATH=${ODOO_ADDONS_PATH}
+      - ODOO_ADDONS_PATH=${ODOO_ADDONS_PATH}
+      - POSTGRES_DB=${POSTGRES_DB}
     ports:
       - "${ODOO_PORT}:8069"
     networks:
       - odoo-network
     volumes:
       - ./addons:/opt/odoo/custom-addons
+      - odoo-data:/var/lib/odoo
+      - odoo-config:/etc/odoo
 
 volumes:
   postgres_data:
+  odoo-data:
+  odoo-config:
 
 networks:
   odoo-network:
