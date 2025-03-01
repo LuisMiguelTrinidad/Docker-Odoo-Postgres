@@ -100,4 +100,5 @@ EXPOSE 8069
 
 # Usar un script para cambiar al usuario odoo después de arreglar los permisos
 ENTRYPOINT ["/entrypoint.sh"]
-CMD ["python3", "odoo-bin"]
+# Mantener el contenedor vivo pero sin iniciar Odoo
+CMD ["tail", "-f", "/dev/null"]

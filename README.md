@@ -30,17 +30,34 @@ Este proyecto configura un entorno de Odoo 17.0 utilizando Docker y Docker Compo
    cd Docker-Odoo-Postgres
    ```
 
-2. **Iniciar servicios**:
+2. **Iniciar contenedores**:
    ```bash
    docker-compose up -d
    ```
+   Esto iniciará los contenedores pero NO iniciará el servicio Odoo automáticamente.
 
-3. **Verificar que los servicios estén funcionando**:
+3. **Inicializar la base de datos**:
+   ```bash
+   docker exec -it odoo-app su odoo -c 'python3 /opt/odoo/odoo/odoo-bin -c /etc/odoo/odoo.conf -d odoo --init=base'
+   ```
+   Este comando creará la base de datos inicial e instalará el módulo base de Odoo.
+
+4. **Iniciar Odoo manualmente**:
+   ```bash
+   docker exec -it odoo-app su odoo -c 'python3 /opt/odoo/odoo/odoo-bin -c /etc/odoo/odoo.conf'
+   ```
+   
+   Para iniciar con modo desarrollador, añade `--dev=all`:
+   ```bash
+   docker exec -it odoo-app su odoo -c 'python3 /opt/odoo/odoo/odoo-bin -c /etc/odoo/odoo.conf --dev=all'
+   ```
+
+5. **Verificar que los servicios estén funcionando**:
    ```bash
    docker-compose ps
    ```
 
-4. **Acceder a Odoo**:
+6. **Acceder a Odoo**:
    Abra su navegador y visite: [http://localhost:8069](http://localhost:8069)
 
 ## Credenciales iniciales
@@ -86,7 +103,7 @@ El proyecto utiliza dos volúmenes para garantizar la persistencia:
 - **Reiniciar servicios**: `docker-compose restart`
 - **Detener servicios**: `docker-compose down`
 - **Acceder al shell**: `docker-compose exec odoo bash`
-- **Actualizar módulo**: `docker-compose exec odoo python3 /opt/odoo/odoo/odoo-bin -c /etc/odoo/odoo.conf -d <database> -u <module>`
+- **Actualizar módulo**: `docker exec -it odoo-app su odoo -c 'python3 /opt/odoo/odoo/odoo-bin -c /etc/odoo/odoo.conf -d <database> -u <module>'`
 
 ## Solución de problemas
 
@@ -131,7 +148,11 @@ cat backup.sql | docker-compose exec -T db psql -U odoo
 1. **Iniciar sesión de depuración:**
    - Abra el panel de depuración en VS Code (Ctrl+Shift+D)
    - Seleccione "Odoo: Debug en Contenedor Docker" de la lista desplegable
-   - Presione F5 para iniciar la depuración
+   - Inicie Odoo manualmente con el depurador:
+     ```bash
+     docker exec -it odoo-app su odoo -c 'python3 -m debugpy --listen 0.0.0.0:5678 --wait-for-client /opt/odoo/odoo/odoo-bin -c /etc/odoo/odoo.conf --dev=all'
+     ```
+   - Presione F5 en VS Code para conectar el depurador
 
 2. **Establecer puntos de interrupción:**
    - Coloque puntos de interrupción en su código haciendo clic a la izquierda del número de línea
@@ -145,13 +166,13 @@ cat backup.sql | docker-compose exec -T db psql -U odoo
 
 ```bash
 # Actualizar un módulo específico
-python /opt/odoo/odoo/odoo-bin -c /etc/odoo/odoo.conf -d odoo -u mi_modulo
+docker exec -it odoo-app su odoo -c 'python /opt/odoo/odoo/odoo-bin -c /etc/odoo/odoo.conf -d odoo -u mi_modulo'
 
 # Ejecutar tests de un módulo
-python /opt/odoo/odoo/odoo-bin -c /etc/odoo/odoo.conf -d odoo --test-enable --stop-after-init -i mi_modulo
+docker exec -it odoo-app su odoo -c 'python /opt/odoo/odoo/odoo-bin -c /etc/odoo/odoo.conf -d odoo --test-enable --stop-after-init -i mi_modulo'
 
 # Abrir una shell interactiva
-python /opt/odoo/odoo/odoo-bin shell -c /etc/odoo/odoo.conf -d odoo
+docker exec -it odoo-app su odoo -c 'python /opt/odoo/odoo/odoo-bin shell -c /etc/odoo/odoo.conf -d odoo'
 ```
 
 ### Opciones avanzadas
