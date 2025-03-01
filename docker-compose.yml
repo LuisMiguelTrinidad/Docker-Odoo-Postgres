@@ -32,6 +32,7 @@ services:
       - DEBUGPY_ENABLE=${DEBUGPY_ENABLE:-0}
     ports:
       - "${ODOO_PORT}:8069"
+      - "8072:8072"  # Puerto para longpolling
       - "5678:5678"  # Puerto para debugger
     networks:
       - odoo-network
