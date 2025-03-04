@@ -23,91 +23,123 @@ Este proyecto configura un entorno de Odoo 17.0 utilizando Docker y Docker Compo
 - Docker Compose (versión 2.0.0+)
 - Git (opcional)
 
-## Script de configuración rápida
+## Inicialización del proyecto
 
-El proyecto incluye un script `setup-project.sh` que automatiza el proceso de instalación:
+Existen dos maneras de inicializar el proyecto:
 
-### Ejecutar directamente desde GitHub
+### Opción 1: Script de configuración rápida (Recomendado)
 
-Para usar el script sin necesidad de clonar todo el repositorio:
+El script `setup-project.sh` automatiza todo el proceso de inicialización:
 
 ```bash
 # Ejecutar directamente sin guardar el script
 bash <(curl -s https://raw.githubusercontent.com/LuisMiguelTrinidad/Docker-Odoo-Postgres/main/setup-project.sh) [opciones]
 ```
 
-### Opciones disponibles
-
+**Opciones disponibles**:
 - `-d, --dir DIR`: Directorio donde clonar (por defecto: odoo-docker-fresh)
 - `-i, --init`: Inicializa un nuevo repositorio Git después de limpiar
 - `-h, --help`: Muestra ayuda sobre el uso del script
 
-### Ejemplos
-
-Configuración básica usando valores por defecto:
+**Ejemplos**:
 ```bash
+# Configuración básica con valores predeterminados
 bash <(curl -s https://raw.githubusercontent.com/LuisMiguelTrinidad/Docker-Odoo-Postgres/main/setup-project.sh)
-```
 
-Especificar directorio de destino:
-```bash
+# Especificar directorio de destino
 bash <(curl -s https://raw.githubusercontent.com/LuisMiguelTrinidad/Docker-Odoo-Postgres/main/setup-project.sh) -d mi_proyecto_odoo
-```
 
-Inicializar Git:
-```bash
+# Inicializar Git automáticamente
 bash <(curl -s https://raw.githubusercontent.com/LuisMiguelTrinidad/Docker-Odoo-Postgres/main/setup-project.sh) -d mi_odoo -i
 ```
 
-El script realiza las siguientes acciones:
-1. Clona el repositorio oficial
-2. Elimina los datos de Git para empezar desde cero
-3. Opcionalmente inicializa un nuevo repositorio Git con un commit inicial
-4. Crea un archivo .gitignore básico para el proyecto
+El script ejecuta:
+1. Clonación del repositorio oficial
+2. Eliminación de los datos de Git para empezar desde cero
+3. Inicialización opcional de un nuevo repositorio Git
+4. Creación de un archivo .gitignore básico
 
-## Configuración y ejecución
+### Opción 2: Configuración manual
 
-1. **Clonar repositorio**:
+1. **Clonar el repositorio**:
    ```bash
-   git clone https://github.com/LuisMiguelTrinidad/Docker-Odoo-Postgres.git
-   cd Docker-Odoo-Postgres
+   git clone https://github.com/LuisMiguelTrinidad/Docker-Odoo-Postgres.git mi_odoo
+   cd mi_odoo
    ```
 
-2. **Iniciar contenedores**:
-   ```bash
-   docker-compose up -d
-   ```
-   Esto iniciará los contenedores pero NO iniciará el servicio Odoo automáticamente.
+2. **Personalizar el entorno** (opcional):
+   - Edite el archivo `.env` para configurar puertos, credenciales, etc.
+   - Modifique `docker-compose.yml` si necesita servicios adicionales
 
-3. **Inicializar la base de datos**:
+3. **Construir e iniciar los contenedores**:
    ```bash
-   docker exec -it odoo-app su odoo -c 'python3 /opt/odoo/odoo/odoo-bin -c /etc/odoo/odoo.conf -d odoo --init=base'
-   ```
-   Este comando creará la base de datos inicial e instalará el módulo base de Odoo.
-
-4. **Iniciar Odoo manualmente**:
-   ```bash
-   docker exec -it odoo-app su odoo -c 'python3 /opt/odoo/odoo/odoo-bin -c /etc/odoo/odoo.conf'
-   ```
-   
-   Para iniciar con modo desarrollador, añade `--dev=all`:
-   ```bash
-   docker exec -it odoo-app su odoo -c 'python3 /opt/odoo/odoo/odoo-bin -c /etc/odoo/odoo.conf --dev=all'
+   docker-compose up -d --build
    ```
 
-5. **Verificar que los servicios estén funcionando**:
-   ```bash
-   docker-compose ps
-   ```
+## Arranque y operación
 
-6. **Acceder a Odoo**:
-   Abra su navegador y visite: [http://localhost:8069](http://localhost:8069)
+Una vez que el proyecto esté instalado, siga estos pasos para iniciar Odoo:
 
-## Credenciales iniciales
+### 1. Iniciar los contenedores
+```bash
+docker-compose up -d
+```
+Esto inicia los servicios pero NO inicia automáticamente Odoo.
 
-Al crear una nueva base de datos, utilice estas credenciales:
+### 2. Crear la primera base de datos
+Para un proyecto nuevo, necesita inicializar la base de datos:
+
+```bash
+docker exec -it odoo-app su odoo -c 'python3 /opt/odoo/odoo/odoo-bin -c /etc/odoo/odoo.conf -d odoo --init=base'
+```
+
+Este comando:
+- Crea una base de datos llamada "odoo"
+- Instala el módulo base obligatorio
+- Configura los parámetros iniciales del sistema
+
+### 3. Iniciar el servicio Odoo
+Elija una de estas opciones según sus necesidades:
+
+**Modo normal**:
+```bash
+docker exec -it odoo-app su odoo -c 'python3 /opt/odoo/odoo/odoo-bin -c /etc/odoo/odoo.conf'
+```
+
+**Modo desarrollo** (recomendado para desarrolladores):
+```bash
+docker exec -it odoo-app su odoo -c 'python3 /opt/odoo/odoo/odoo-bin -c /etc/odoo/odoo.conf --dev=all'
+```
+
+### 4. Acceder a Odoo
+Abra su navegador y visite:
+- [http://localhost:8069](http://localhost:8069)
+
+**Credenciales iniciales**:
 - **Email/Usuario**: admin
 - **Contraseña**: admin
+
+### 5. Comandos de gestión habituales
+
+**Detener los servicios**:
+```bash
+docker-compose down
+```
+
+**Reiniciar los servicios**:
+```bash
+docker-compose restart
+```
+
+**Ver logs en tiempo real**:
+```bash
+docker-compose logs -f odoo
+```
+
+**Actualizar un módulo específico**:
+```bash
+docker exec -it odoo-app su odoo -c 'python3 /opt/odoo/odoo/odoo-bin -c /etc/odoo/odoo.conf -d odoo -u nombre_modulo'
+```
 
 ## Personalización
 
@@ -139,14 +171,6 @@ Edite el archivo `.env` para personalizar:
 El proyecto utiliza dos volúmenes para garantizar la persistencia:
 - `postgres_data`: Almacena los datos de la base de datos PostgreSQL
 - `odoo-data`: Almacena archivos de sesión, subidos y generados por Odoo
-
-## Comandos útiles
-
-- **Ver logs**: `docker-compose logs -f odoo`
-- **Reiniciar servicios**: `docker-compose restart`
-- **Detener servicios**: `docker-compose down`
-- **Acceder al shell**: `docker-compose exec odoo bash`
-- **Actualizar módulo**: `docker exec -it odoo-app su odoo -c 'python3 /opt/odoo/odoo/odoo-bin -c /etc/odoo/odoo.conf -d <database> -u <module>'`
 
 ## Solución de problemas
 
@@ -209,10 +233,10 @@ cat backup.sql | docker-compose exec -T db psql -U odoo
 
 ```bash
 # Actualizar un módulo específico
-docker exec -it odoo-app su odoo -c 'python /opt/odoo/odoo/odoo-bin -c /etc/odoo/odoo.conf -d odoo -u mi_modulo'
+docker exec -it odoo-app su odoo -c 'python /opt/odoo/odoo/odoo-bin -c /etc/odoo/odoo/odoo.conf -d odoo -u mi_modulo'
 
 # Ejecutar tests de un módulo
-docker exec -it odoo-app su odoo -c 'python /opt/odoo/odoo/odoo-bin -c /etc/odoo/odoo.conf -d odoo --test-enable --stop-after-init -i mi_modulo'
+docker exec -it odoo-app su odoo -c 'python /opt/odoo/odoo/odoo-bin -c /etc/odoo/odoo/odoo.conf -d odoo --test-enable --stop-after-init -i mi_modulo'
 
 # Abrir una shell interactiva
 docker exec -it odoo-app su odoo -c 'python /opt/odoo/odoo/odoo-bin shell -c /etc/odoo/odoo.conf -d odoo'
