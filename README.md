@@ -27,15 +27,17 @@ Este proyecto configura un entorno de Odoo 17.0 utilizando Docker y Docker Compo
 
 El proyecto incluye un script `setup-project.sh` que automatiza el proceso de instalación:
 
-### Uso del script
+### Ejecutar directamente desde GitHub
+
+Para usar el script sin necesidad de clonar todo el repositorio:
 
 ```bash
-./setup-project.sh [opciones]
+# Ejecutar directamente sin guardar el script
+bash <(curl -s https://raw.githubusercontent.com/LuisMiguelTrinidad/Docker-Odoo-Postgres/main/setup-project.sh) [opciones]
 ```
 
 ### Opciones disponibles
 
-- `-r, --repo URL`: URL del repositorio a clonar (por defecto: https://github.com/LuisMiguelTrinidad/Docker-Odoo-Postgres.git)
 - `-d, --dir DIR`: Directorio donde clonar (por defecto: odoo-docker-fresh)
 - `-i, --init`: Inicializa un nuevo repositorio Git después de limpiar
 - `-h, --help`: Muestra ayuda sobre el uso del script
@@ -44,21 +46,21 @@ El proyecto incluye un script `setup-project.sh` que automatiza el proceso de in
 
 Configuración básica usando valores por defecto:
 ```bash
-./setup-project.sh
+bash <(curl -s https://raw.githubusercontent.com/LuisMiguelTrinidad/Docker-Odoo-Postgres/main/setup-project.sh)
 ```
 
 Especificar directorio de destino:
 ```bash
-./setup-project.sh -d mi_proyecto_odoo
+bash <(curl -s https://raw.githubusercontent.com/LuisMiguelTrinidad/Docker-Odoo-Postgres/main/setup-project.sh) -d mi_proyecto_odoo
 ```
 
-Clonar desde otro repositorio e inicializar Git:
+Inicializar Git:
 ```bash
-./setup-project.sh -r https://github.com/usuario/otro-repo-odoo.git -d mi_odoo -i
+bash <(curl -s https://raw.githubusercontent.com/LuisMiguelTrinidad/Docker-Odoo-Postgres/main/setup-project.sh) -d mi_odoo -i
 ```
 
 El script realiza las siguientes acciones:
-1. Clona el repositorio especificado
+1. Clona el repositorio oficial
 2. Elimina los datos de Git para empezar desde cero
 3. Opcionalmente inicializa un nuevo repositorio Git con un commit inicial
 4. Crea un archivo .gitignore básico para el proyecto

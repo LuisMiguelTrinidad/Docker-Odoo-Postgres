@@ -19,8 +19,8 @@ print_info() {
     echo -e "${BLUE}INFO:${NC} $1"
 }
 
-# URL del repositorio por defecto
-DEFAULT_REPO="https://github.com/LuisMiguelTrinidad/Docker-Odoo-Postgres.git"
+# URL del repositorio fijo
+REPO_URL="https://github.com/LuisMiguelTrinidad/Docker-Odoo-Postgres.git"
 # Directorio destino por defecto
 DEFAULT_DIR="odoo-docker-fresh"
 
@@ -28,11 +28,10 @@ DEFAULT_DIR="odoo-docker-fresh"
 show_help() {
     echo "Uso: $0 [opciones]"
     echo
-    echo "Este script clona un repositorio de Odoo Docker y elimina todos los datos de Git"
+    echo "Este script clona el repositorio Odoo Docker y elimina todos los datos de Git"
     echo "para comenzar con un proyecto limpio."
     echo
     echo "Opciones:"
-    echo "  -r, --repo URL     URL del repositorio a clonar (por defecto: $DEFAULT_REPO)"
     echo "  -d, --dir DIR      Directorio donde clonar (por defecto: $DEFAULT_DIR)"
     echo "  -i, --init         Inicializa un nuevo repositorio Git después de limpiar"
     echo "  -h, --help         Muestra esta ayuda"
@@ -40,17 +39,12 @@ show_help() {
 }
 
 # Valores por defecto
-REPO_URL=$DEFAULT_REPO
 TARGET_DIR=$DEFAULT_DIR
 INIT_GIT=false
 
 # Procesar opciones de línea de comandos
 while [[ $# -gt 0 ]]; do
     case $1 in
-        -r|--repo)
-            REPO_URL="$2"
-            shift 2
-            ;;
         -d|--dir)
             TARGET_DIR="$2"
             shift 2
@@ -73,7 +67,6 @@ done
 
 # Comenzar el proceso
 print_message "Iniciando configuración del proyecto Odoo Docker"
-print_info "Repositorio: $REPO_URL"
 print_info "Directorio destino: $TARGET_DIR"
 
 # Comprobar si el directorio ya existe
@@ -83,7 +76,7 @@ if [ -d "$TARGET_DIR" ]; then
 fi
 
 # Clonar el repositorio
-print_message "Clonando repositorio..."
+print_message "Clonando repositorio oficial..."
 if git clone "$REPO_URL" "$TARGET_DIR"; then
     print_info "Repositorio clonado correctamente"
 else
@@ -132,8 +125,5 @@ print_info "Para comenzar, ejecute:"
 print_info "  cd $TARGET_DIR"
 print_info "  docker-compose up -d"
 print_info "  docker exec -it odoo-app su odoo -c 'python3 /opt/odoo/odoo/odoo-bin -c /etc/odoo/odoo.conf -d odoo --init=base'"
-
-# Hacer ejecutable el script setup-project.sh
-chmod +x setup-project.sh
 
 exit 0
