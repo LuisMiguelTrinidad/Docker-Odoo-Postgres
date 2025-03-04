@@ -87,13 +87,40 @@ fi
 # Cambiar al directorio clonado
 cd "$TARGET_DIR" || { print_error "No se pudo acceder al directorio $TARGET_DIR"; exit 1; }
 
-# Eliminar los datos de Git
-print_message "Eliminando datos de Git..."
+# Eliminar los datos de Git y archivos relacionados
+print_message "Eliminando datos y archivos relacionados con Git..."
+# Eliminar directorio .git
 if [ -d ".git" ]; then
     rm -rf .git
-    print_info "Datos de Git eliminados correctamente"
+    print_info "Directorio .git eliminado correctamente"
 else
     print_info "No se encontró directorio .git"
+fi
+
+# Eliminar otros archivos relacionados con Git
+git_files=(.gitignore .gitmodules .gitattributes .git*)
+for file in "${git_files[@]}"; do
+    if [ -f "$file" ]; then
+        rm "$file"
+        print_info "Archivo $file eliminado"
+    fi
+done
+
+# Eliminar archivos .gitkeep en todos los directorios
+print_message "Eliminando archivos .gitkeep..."
+gitkeep_count=$(find . -name ".gitkeep" | wc -l)
+if [ "$gitkeep_count" -gt 0 ]; then
+    find . -name ".gitkeep" -type f -delete
+    print_info "$gitkeep_count archivo(s) .gitkeep eliminado(s)"
+else
+    print_info "No se encontraron archivos .gitkeep"
+fi
+
+# Eliminar el script setup-project.sh
+if [ -f "setup-project.sh" ]; then
+    print_message "Eliminando script setup-project.sh..."
+    rm setup-project.sh
+    print_info "Script setup-project.sh eliminado"
 fi
 
 # Inicializar nuevo repositorio Git si se solicita
