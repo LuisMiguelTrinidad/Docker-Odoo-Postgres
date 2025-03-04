@@ -13,6 +13,7 @@ Este proyecto configura un entorno de Odoo 17.0 utilizando Docker y Docker Compo
 ├── entrypoint.sh           # Script de punto de entrada para el contenedor
 ├── external-requirements.txt  # Dependencias Python adicionales
 ├── fix-permissions.sh      # Script para corregir permisos
+├── setup-project.sh        # Script para configurar el proyecto fácilmente
 └── README.md               # Este archivo
 ```
 
@@ -21,6 +22,46 @@ Este proyecto configura un entorno de Odoo 17.0 utilizando Docker y Docker Compo
 - Docker Engine (versión 20.10.0+)
 - Docker Compose (versión 2.0.0+)
 - Git (opcional)
+
+## Script de configuración rápida
+
+El proyecto incluye un script `setup-project.sh` que automatiza el proceso de instalación:
+
+### Uso del script
+
+```bash
+./setup-project.sh [opciones]
+```
+
+### Opciones disponibles
+
+- `-r, --repo URL`: URL del repositorio a clonar (por defecto: https://github.com/LuisMiguelTrinidad/Docker-Odoo-Postgres.git)
+- `-d, --dir DIR`: Directorio donde clonar (por defecto: odoo-docker-fresh)
+- `-i, --init`: Inicializa un nuevo repositorio Git después de limpiar
+- `-h, --help`: Muestra ayuda sobre el uso del script
+
+### Ejemplos
+
+Configuración básica usando valores por defecto:
+```bash
+./setup-project.sh
+```
+
+Especificar directorio de destino:
+```bash
+./setup-project.sh -d mi_proyecto_odoo
+```
+
+Clonar desde otro repositorio e inicializar Git:
+```bash
+./setup-project.sh -r https://github.com/usuario/otro-repo-odoo.git -d mi_odoo -i
+```
+
+El script realiza las siguientes acciones:
+1. Clona el repositorio especificado
+2. Elimina los datos de Git para empezar desde cero
+3. Opcionalmente inicializa un nuevo repositorio Git con un commit inicial
+4. Crea un archivo .gitignore básico para el proyecto
 
 ## Configuración y ejecución
 
